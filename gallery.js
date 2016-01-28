@@ -9,7 +9,9 @@
 
 var
   show_captions = true,
-  was_fullscreen = false;
+  was_fullscreen = false,
+  perfect_layout = require('perfect-layout'),
+  screenfull = require('screenfull');
   
 
 //----------------------------------------------------------------------------
@@ -227,7 +229,7 @@ $.fn.perfectLayout = function(photos) {
 	//--- initialize
 	
   const node = this;
-  const perfectRows = perfectLayout(
+  const perfectRows = perfect_layout.default(
 	  photos, $(this).width() - 1, window.innerHeight, {margin: 2}
 	);
   node.empty();

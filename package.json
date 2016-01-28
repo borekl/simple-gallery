@@ -1,0 +1,35 @@
+{
+  "name": "simple-gallery",
+  "version": "0.0.1",
+  "description": "Simple no-frills image gallery",
+  "main": "gallery.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/borekl/simple-gallery.git"
+  },
+  "keywords": [
+    "gallery",
+    "image"
+  ],
+  "author": "Borek Lupomesky",
+  "license": "BSD-2-Clause",
+  "bugs": {
+    "url": "https://github.com/borekl/simple-gallery/issues"
+  },
+  "devDependencies": {
+    "grunt": "~0.4.5",
+    "browserify": "~13.0.0",
+    "grunt-browserify": "~4.0.1",
+    "grunt-contrib-uglify": "~0.11.0",
+    "babelify": "~7.2.0",
+    "babel-preset-es2015": "~6.3.13",
+    "grunt-contrib-clean": "~0.7.0"
+  },
+  "dependencies": {
+    "perfect-layout": "~1.2.1",
+    "screenfull": "~3.0.0"
+  }
+}
