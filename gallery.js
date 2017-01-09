@@ -226,24 +226,24 @@ function single_image(e)
 
 $.fn.perfectLayout = function(photos) {
 	
-	//--- initialize
+  //--- initialize
 	
   const node = this;
   const perfectRows = perfect_layout.default(
-	  photos, $(this).width() - 1, window.innerHeight, {margin: 2}
-	);
+    photos, $(this).width() - 1, window.innerHeight, {margin: 2}
+  );
   node.empty();
 
-	//--- iterate over the images
-	
+  //--- iterate over the images
+
   perfectRows.forEach(function (row) {
     row.forEach(function (img) {
-      
-	//--- create DOM objects
-  
+
+  //--- create DOM objects
+
       var divNode = $('<div class="image"></div>');
       var contentNode, jq_caption, srcNode;
-      
+
       if("type" in img.data && img.data.type == 'video') {
 
         srcNode = $('<source>').attr('src', img.src);
@@ -258,7 +258,7 @@ $.fn.perfectLayout = function(photos) {
         if("poster" in img.data) {
           contentNode.attr('poster', img.data.poster);
         }
-      
+
       } else {
 
         contentNode = $('<img>')
