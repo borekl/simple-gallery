@@ -8,6 +8,8 @@
 //----------------------------------------------------------------------------
 
 var
+  base_url,
+  start_with_image,
   show_captions = true,
   was_fullscreen = false,
   perfect_layout = require('perfect-layout'),
@@ -21,8 +23,7 @@ var
 
 function trim_current_url()
 {
-  var url = window.location.href;
-  var url_arr = url.split('/');
+  var url_arr = base_url.split('/');
   url_arr.pop();
   url_arr.pop();
   return( url_arr.join('/') );
@@ -85,7 +86,7 @@ function keyboard_evt_fill(evt)
     evt.key = "i";
   }
   
-  return;  
+  return;
 }
 
 
@@ -115,6 +116,7 @@ function single_image(e)
     $('div#browse').css('display', 'none').off().children().remove();
     $(window).off('resize', caption_place);
     $(document).off('keydown', keyevt).trigger('inhibit_keys', [false]);
+    history.replaceState(null, null, base_url);
     // trigger click on another main gallery image
     if(xpos < 33) { 
       $('div.image img[data-n=' + (parseInt(img.data.n)-1) +']').trigger('click');
@@ -129,14 +131,17 @@ function single_image(e)
   //--- set up the image
   
   img_browse.attr({
-    'src' :    img.src,
-    'srcset' : img.data.srcset
+    'src' :    base_url + img.src,
+    'srcset' : img.data.srcset.map(
+      function(x) { return base_url + x; }
+    ).join(", "),
   })
   .addClass('overlay')
   
   //--- click handler for the image
   
   .on('click', img, function(evt, pdiv, clientX) {
+    evt.stopPropagation();
     var 
       img = evt.data,
       el = pdiv ? pdiv : this,
@@ -146,14 +151,13 @@ function single_image(e)
         / $(el).width() * 100
       );
     single_nav(xpos, img);
-    return false;
   });
   
   //--- clicking on the background div should also work to move back/forward
   
   $('div#browse').on('click', function(evt) {
+    evt.stopPropagation();
     $(this).find('img').trigger('click', [this, evt.clientX]);
-    return false;
   });
   
   //--- keyboard navigation
@@ -209,7 +213,11 @@ function single_image(e)
     }
     return false;
   }).trigger('resize');
-  
+
+  //--- update URL
+
+  history.replaceState(null, null, base_url + 'i/' + img.data.basename + '/');
+
   //--- add the image to DOM
   
   $('div#browse').css('display', 'block').append(img_browse);
@@ -266,15 +274,17 @@ $.fn.perfectLayout = function(photos) {
         .attr({
           'width':   img.width + 'px',
           'height':  img.height + 'px',
-          'src' :    img.src,
-          'srcset' : img.data.srcset,
+          'src' :    base_url + img.src,
+          'srcset' : img.data.srcset.map(
+            function(x) { return base_url + x; }
+          ).join(", "),
           'data-n' : img.data.n
         })
         .on('click', img, single_image);
       }
 
-	//--- click on image initiates single-image browsing
-	
+  //--- click on image initiates single-image browsing
+
       // surrounding div
       divNode.append(contentNode);
       // caption, if any
@@ -294,6 +304,7 @@ $.fn.perfectLayout = function(photos) {
 
 function go_to(e)
 {
+  e.stopPropagation();
   if(e.data.r == 'home') {
     window.location.assign(trim_current_url() + '/');
   } else if(e.data.r == 'dir') {
@@ -312,12 +323,21 @@ function render_page(gallery)
   var 
     jq_gallery = $('#gallery'),
     jq_title = $('#title'),
-    inhibit_keys = false;
+    inhibit_keys = false,
+    start_with_image_idx;
 
-  //--- number the entries
+  //--- number the entries, if deeplinking for specific image
+  //--- record its index
   
   for(var i = 0, max = gallery.items.length; i < max; i++) {
     gallery.items[i].data.n = i;
+    if(start_with_image
+       && 'basename' in gallery.items[i].data
+       && gallery.items[i].data.basename == start_with_image
+    ) {
+      start_with_image = null;
+      start_with_image_idx = i;
+    }
   }
 		
   //--- gallery title
@@ -407,6 +427,13 @@ function render_page(gallery)
   
   $(window).on('resize', resize);
   $(window).trigger('resize');
+
+  //--- switch to initial image if requested
+
+  if(start_with_image_idx != null) {
+    $('#gallery img[data-n=' + start_with_image_idx  + ']').click();
+  }
+
 }
 
 
@@ -416,7 +443,25 @@ function render_page(gallery)
 
 $(document).ready(function ()
 {
-  $.get("index.json", render_page);
+  var
+    url, l;
+
+  //--- parse the URL
+  // the URL parsing is here to get arguments that allow passing some state
+  // into this code; currently we're looking only for /i/BASENAME/ pattern
+  // at the end of the URL, that is used to reference single image.
+
+  url = document.location.pathname.split('/');
+  l = url.length;
+  if(url[l-3] == 'i') {
+    start_with_image = url[l-2];
+    url.splice(l-3, 2);
+  }
+
+  //--- get the index and render the page
+
+  base_url = url.join('/');
+  $.get(base_url + "index.json", render_page);
 });
 
 

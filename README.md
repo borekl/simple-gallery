@@ -1,13 +1,8 @@
 # simple-gallery
 
-Minimalistic no-frills image gallery that puts images/videos into the
-centre of user's experience. It supports responsive images, navigation with
-keyboard and has some support for collections of galleries.
+Minimalistic no-frills image gallery that puts images/videos into the centre of user's experience. It supports responsive images, navigation with keyboard and has some support for collections of galleries.
 
-The gallery is a personal project primarily designed to power
-[this](https://voyager.lupomesky.cz/fotky/tracy/) gallery. Therefore, it is
-not very polished and might contain all kinds of stuff specific to my
-own use.
+The gallery is a personal project primarily designed to power [this](https://voyager.lupomesky.cz/fotky/tracy/) gallery. Therefore, it is not very polished and might contain all kinds of stuff specific to my own use.
 
 ## Components used
 
@@ -65,3 +60,12 @@ Following apache2 config sets up a directory, where you will store your gallerie
       DirectoryIndex /gallery/gallery.html
     </Directory>
 
+### Deep links to images
+
+The gallery allows for linking to specific images and also updates the URL accordingly when you browse the gallery (so that you can bookmark or share individual images). For this to work, you must add following rewrite rule to your Apache config:
+
+    RewriteRule "(.*)/i/[^/]+/$" "$1/" [PT,L]
+
+The deep link URL has the form of `/<gallery-base>/i/<image-basename/`, where *gallery-base* is the directory where the `info.json` and `index.json` files are; *image-basename* is the image file name without its extension.
+
+Please note, that opening the image through the "deep link" will still read the entire gallery in the background!

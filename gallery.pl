@@ -195,6 +195,9 @@ sub gallery_index
   for my $cimg (sort @$imgfiles) {
     my ($img_w, $img_h) = imgsize("${path}1x/$cimg");
     my (%entry, @srcset);
+    my $basename = $cimg;
+
+    $basename =~ s/\..+$//;
 
     # 'srcset' images from 1x to 4x;
     # 'src' gets the lowest DPR image available    
@@ -206,10 +209,11 @@ sub gallery_index
     }
 
     $entry{'ratio'} = $img_w / $img_h;
-    $entry{'data'}{'srcset'}  = join(", ", @srcset);
+    $entry{'data'}{'srcset'}  = \@srcset;
     $entry{'data'}{'caption'} = $info->{captions}{$cimg}
       if $info->{'captions'}{$cimg};
     $entry{'data'}{'type'} = 'image';
+    $entry{'data'}{'basename'} = $basename;
       
     push(@{$gallery{'items'}}, \%entry);
   }
@@ -219,8 +223,11 @@ sub gallery_index
   for my $cvid (sort @$vidfiles) {
     my ($vid_w, $vid_h) = avprobe("${path}video/$cvid");
     my (%entry);
+    my $basename = $cvid;
 	
     next if !$vid_w || !$vid_h;
+
+    $basename =~ s/\..+$//;
     
     # try to find poster image
     my $poster = "${path}video/$cvid";
@@ -229,6 +236,7 @@ sub gallery_index
     $entry{'ratio'} = $vid_w / $vid_h;
     $entry{'data'}{'type'} = 'video';
     $entry{'data'}{'poster'} = $poster if -f $poster;
+    $entry{'data'}{'basename'} = $basename;
 	
     push(@{$gallery{'items'}}, \%entry);
   }
