@@ -1,5 +1,7 @@
 # simple-gallery
 
+**NOTE** This gallery contains some significant bugs and shortcomings and the underlying perfect-layout library is unfortunately flawed. New version of the *simple-gallery* is in development to address these issues.
+
 Minimalistic no-frills image gallery that puts images/videos into the centre of user's experience. It supports responsive images, navigation with keyboard and has some support for collections of galleries.
 
 The gallery is a personal project primarily designed to power [this](https://voyager.lupomesky.cz/fotky/tracy/) gallery. Therefore, it is not very polished and might contain all kinds of stuff specific to my own use.
